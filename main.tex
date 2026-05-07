@@ -58,9 +58,9 @@ Universidad de Oviedo\\
 \subsection*{Parámetros}
 
 \begin{alignat}{2}
-&n = |I| \qquad && \text{número de drones disponibles} \\
-&m = |J| = 2 \times |\text{barridos}| + 1 \qquad && \text{número total de puntos incluyendo la estación de control} \\
-&c_{j_1 j_2} \qquad && \text{distancia euclídea entre el punto } j_1 \text{ y el punto } j_2, \quad j_1, j_2 \in J
+&n = |I|          \qquad && \text{número de drones disponibles} \\
+&m = |J|          \qquad && \text{número total de puntos}\ (m = 2 \times |\text{barridos}| + 1) \\
+&c_{j_1 j_2}     \qquad && \text{distancia euclídea entre el punto } j_1 \text{ y el punto } j_2, \quad j_1, j_2 \in J
 \end{alignat}
 
 \subsection*{Variables de Decisión}
@@ -90,6 +90,19 @@ Universidad de Oviedo\\
     U_i &\leq \sum_{j \in J \setminus \{1\}} \sum_{k \in K} X_{ijk} \qquad \forall i \in I \\
     U_i &\geq \frac{1}{m-1} \sum_{j \in J \setminus \{1\}} \sum_{k \in K} X_{ijk} \qquad \forall i \in I
 \end{align}
+
+\noindent\textit{La estación de control es el primer punto de cada ruta:}
+\begin{equation}
+    X_{i,1,1} = 1 \qquad \forall i \in I
+\end{equation}
+
+\noindent\textit{Ningún punto puede ser visitado después de la estación de control:}
+\begin{equation}
+    (1 - X_{i,1,k}) \cdot m \geq \sum_{j \in J \setminus \{1\}} \sum_{k_2 = k+1}^{|K|} X_{ij k_2}
+    \qquad \forall i \in I,\ \forall k \in K \setminus \{1\}
+\end{equation}
+
+\noindent\textbf{Nota sobre la constante $m$:} en la restricción anterior se emplea una formulación Big-M con $M = m$. El lado derecho está acotado superiormente por $m - 1$ (número máximo de extremos de barrido asignables a un dron), por lo que $m$ es un valor válido y suficiente. Se prefiere $m$ sobre $m-1$ por simplicidad notacional, dado que $m$ es un parámetro ya definido en el modelo.
 
 \subsection*{Funciones Objetivo}
 
