@@ -1,0 +1,114 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage{listings}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\title{Métodos Basados en el Conocimiento Aplicado a Empresas\\
+       Módulo de Metaheurística}
+
+\author{\\\\
+\textbf{Integrantes:}\\\\
+Andrés Augusto Aragón Dimas - UO316049 \\
+Alberto Martínez Olivar - UO282069\\ 
+Manuel De La Uz González - UO288991\\ 
+Juan Camilo España Lopera - U0318200\\\\\\
+\textbf{Profesor:}\\\\
+Jorge Puente Peinador\\\\\\
+Universidad de Oviedo\\
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\tableofcontents
+% -------------------------------------------------\section{Introducción y Contexto del Problema}
+
+\newpage
+\section{Introducción y Contexto del Problema}
+\section{Modelamiento Formal del Problema de Drones}
+
+\subsection*{Índices}
+
+\begin{alignat}{2}
+&i \in I \qquad && \text{índice de drones} \\
+&j \in J \qquad && \text{índice de puntos: barridos y estación de control} \\
+&k \in K \qquad && \text{índice del orden de visita de puntos en una ruta}
+\end{alignat}
+
+\noindent siendo $j = 1$ la estación de control y los índices restantes los extremos de cada barrido.
+
+\subsection*{Parámetros}
+
+\begin{alignat}{2}
+&n = |I| \qquad && \text{número de drones disponibles} \\
+&m = |J| = 2 \times |\text{barridos}| + 1 \qquad && \text{número total de puntos incluyendo la estación de control} \\
+&D_{j_1 j_2} \qquad && \text{distancia euclídea entre el punto } j_1 \text{ y el punto } j_2, \quad j_1, j_2 \in J
+\end{alignat}
+
+\subsection*{Variable de Decisión}
+
+\begin{equation}
+    X_{ijk} = \begin{cases}
+        1 & \text{si el dron } i \text{ visita el punto } j \text{ en el orden } k \\
+        0 & \text{en caso contrario}
+    \end{cases}
+\end{equation}
+
+\subsection*{Variables Auxiliares}
+
+\begin{equation}
+    D_i = \sum_{j_1 \in J} \sum_{j_2 \in J} \sum_{k \in K} X_{ij_1k} \cdot X_{ij_2,k+1} \cdot D_{j_1 j_2} \qquad \forall i \in I
+\end{equation}
+
+\noindent donde $D_i$ representa la distancia total recorrida por el dron $i$.
+
+\bigskip
+\noindent\textbf{Nota sobre no linealidad:} la expresión de $D_i$ contiene productos de variables binarias, lo que introduce no linealidad en el modelo. Esta formulación se mantiene de forma descriptiva con el único propósito de clarificar la estructura del problema; la resolución se realiza mediante metaheurísticas, que no requieren linealidad en el modelo matemático.
+
+
+\section{Modelamiento del Algoritmo Genético}
+
+\section{Descripción del Código Implementado}
+
+\section{Fase 1: Evaluación de la Convergencia Práctica}
+
+\section{Fase 2: Análisis Paramétrico}
+
+\subsection{Factores Mínimos de Estudio}
+
+\section{Indicadores y Análisis de Resultados}
+
+\section{Contraste con Búsqueda Aleatoria}
+
+\section{Interpretación de Soluciones Representativas del Frente de Pareto}
+
+\section{Conclusiones}
+
+\section{Aportaciones Individuales}
+
+\section{Referencias y Recursos Utilizados}
+
+Ejemplo citación \cite{chatterjee1999recursive}
+
+
+\bibliographystyle{plainnat} 
+\bibliography{ref}
+
+\end{document}
