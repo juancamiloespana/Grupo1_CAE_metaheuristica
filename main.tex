@@ -45,6 +45,8 @@ Universidad de Oviedo\\
 \section{Introducción y Contexto del Problema}
 \section{Modelamiento Formal del Problema de Drones}
 
+A continuación se presenta la formulación matemática del problema de asignación y ruteo de drones. El modelo define los conjuntos de entidades involucradas mediante \textbf{índices}, los datos fijos del problema mediante \textbf{parámetros}, las decisiones a tomar mediante la \textbf{variable de decisión} $X_{ijk}$ y las magnitudes derivadas de ella mediante \textbf{variables auxiliares}. Las \textbf{funciones objetivo} expresan los dos criterios a minimizar simultáneamente, y las \textbf{restricciones} delimitan el espacio de soluciones factibles, codificando las reglas operacionales del problema. La sección concluye con los valores concretos de la \textbf{instancia de estudio} utilizada en los experimentos.
+
 \subsection*{Índices}
 
 \begin{alignat}{2}
@@ -59,8 +61,12 @@ Universidad de Oviedo\\
 
 \begin{alignat}{2}
 &n = |I|          \qquad && \text{número de drones disponibles} \\
-&m = |J|          \qquad && \text{número total de puntos}\ (m = 2 \times |\text{barridos}| + 1) \\
-&c_{j_1 j_2}     \qquad && \text{distancia euclídea entre el punto } j_1 \text{ y el punto } j_2, \quad j_1, j_2 \in J
+&s = \frac{1}{2}\sum_{j_1 \in J}\sum_{j_2 \in J} b_{j_1 j_2} \qquad && \text{número de barridos} \\
+&m = |J|          \qquad && \text{número total de puntos}\ (m = 2s + 1) \\
+&|K| = m + 1      \qquad && \text{número máximo de posiciones de orden en una ruta} \\
+&c_{j_1 j_2}     \qquad && \text{distancia euclídea entre el punto } j_1 \text{ y el punto } j_2, \quad j_1, j_2 \in J \\
+&b_{j_1 j_2}     \qquad && \text{1 si } j_1 \text{ y } j_2 \text{ son los extremos de un mismo barrido, 0 en otro caso} \\
+&                \qquad && \quad (b_{j_1 j_2} = b_{j_2 j_1},\ b_{j_1 j_1} = 0 \quad \forall j_1, j_2 \in J)
 \end{alignat}
 
 \subsection*{Variables de Decisión}
@@ -78,6 +84,13 @@ Universidad de Oviedo\\
     &U_i \in \{0, 1\}            \qquad && \text{1 si el dron } i \text{ es activo, 0 en caso contrario},\quad \forall i \in I
 \end{alignat}
 
+\subsection*{Funciones Objetivo}
+
+\begin{align}
+    f_1 &= \min_{} \max_{i \in I} D_i \\
+    f_2 &= \min_{} \sum_{i \in I} U_i
+\end{align}
+
 \subsection*{Restricciones}
 
 \noindent\textit{Definición de distancia total por dron:}
@@ -93,26 +106,47 @@ Universidad de Oviedo\\
 
 \noindent\textit{La estación de control es el primer punto de cada ruta:}
 \begin{equation}
-    X_{i,1,1} = 1 \qquad \forall i \in I
+    X_{i,1,1} = 1 \qquad \forall i \in I \label{eq:cs_first}
+\end{equation}
+
+\noindent\textit{La estación de control aparece exactamente dos veces en cada ruta (inicio y retorno):}
+\begin{equation}
+    \sum_{k \in K} X_{i,1,k} = 2 \qquad \forall i \in I \label{eq:cs_twice}
 \end{equation}
 
 \noindent\textit{Ningún punto puede ser visitado después de la estación de control:}
 \begin{equation}
     (1 - X_{i,1,k}) \cdot m \geq \sum_{j \in J \setminus \{1\}} \sum_{k_2 = k+1}^{|K|} X_{ij k_2}
-    \qquad \forall i \in I,\ \forall k \in K \setminus \{1\}
+    \qquad \forall i \in I,\ \forall k \in K \setminus \{1\} \label{eq:cs_last}
 \end{equation}
 
-\noindent\textbf{Nota sobre la constante $m$:} en la restricción anterior se emplea una formulación Big-M con $M = m$. El lado derecho está acotado superiormente por $m - 1$ (número máximo de extremos de barrido asignables a un dron), por lo que $m$ es un valor válido y suficiente. Se prefiere $m$ sobre $m-1$ por simplicidad notacional, dado que $m$ es un parámetro ya definido en el modelo.
+\noindent\textit{Un solo punto por posición de orden (excluida la CS):}
+\begin{equation}
+    \sum_{j \in J \setminus \{1\}} X_{ijk} \leq 1 \qquad \forall i \in I,\ \forall k \in K
+\end{equation}
 
-\subsection*{Funciones Objetivo}
+\noindent\textit{Cada punto de barrido es visitado exactamente una vez:}
+\begin{equation}
+    \sum_{i \in I} \sum_{k \in K} X_{ijk} = 1 \qquad \forall j \in J \setminus \{1\}
+\end{equation}
 
-\begin{align}
-    f_1 &= \min_{} \max_{i \in I} D_i \\
-    f_2 &= \min_{} \sum_{i \in I} U_i
-\end{align}
+\noindent\textit{Los dos extremos de cada barrido deben ser visitados de forma consecutiva:}
+\begin{equation}
+    X_{ij_1 k} \leq \sum_{j_2 \in J \setminus \{1\}} \left( X_{ij_2,k-1} + X_{ij_2,k+1} \right) b_{j_1 j_2}
+    \qquad \forall i \in I,\ j_1 \in J \setminus \{1\},\ k \in K \setminus \{1,\ |K|\}
+\end{equation}
+
+\noindent\textit{Las posiciones de orden deben ser consecutivas, sin saltos:}
+\begin{equation}
+    \sum_{j \in J} X_{ijk} \leq \sum_{j \in J} X_{ij,k-1} \qquad \forall i \in I,\ \forall k \in K \setminus \{1\}
+\end{equation}
 
 \bigskip
-\noindent\textbf{Nota sobre la formulación:} algunas expresiones de este modelo — como la definición de $D_i$ o la función objetivo $f_1$ — son intencionalmente no lineales. El propósito de esta formulación es descriptivo: clarificar la estructura del problema y las relaciones entre sus elementos. La resolución se realiza mediante metaheurísticas, que no requieren linealidad ni convexidad en el modelo matemático.
+\noindent\textbf{Nota sobre la constante $m$:} la restricción (\ref{eq:cs_last}) emplea una formulación Big-M con $M = m$. El lado derecho está acotado superiormente por $m-1$, por lo que $m$ es válido y suficiente; se prefiere sobre $m-1$ por simplicidad notacional al ser un parámetro ya definido.
+
+\noindent\textbf{Implicación:} un dron inactivo se representa unívocamente como la ruta CS$\rightarrow$CS, con $X_{i,1,1}=1$, $X_{i,1,2}=1$ y cero en el resto, lo que produce $U_i = 0$.
+
+\noindent\textbf{Nota sobre la formulación:} algunas expresiones — como la definición de $D_i$ o la función objetivo $f_1$ — son intencionalmente no lineales. El propósito de esta formulación es descriptivo: clarificar la estructura del problema y las relaciones entre sus elementos. La resolución se realiza mediante metaheurísticas, que no requieren linealidad ni convexidad en el modelo matemático.
 
 \subsection*{Instancia de Estudio}
 
@@ -120,8 +154,9 @@ La instancia utilizada en este trabajo es \textbf{Valdebueyes3}, cuyos parámetr
 
 \begin{alignat}{2}
     &n = 10    \qquad && \text{drones disponibles} \\
-    &|\text{barridos}| = 122 \qquad && \text{barridos a cubrir} \\
-    &m = 2 \times 122 + 1 = 245 \qquad && \text{puntos totales incluyendo la estación de control} \\
+    &s = 122 \qquad && \text{barridos a cubrir} \\
+    &m = 2s + 1 = 245 \qquad && \text{puntos totales incluyendo la estación de control} \\
+    &|K| = m + 1 = 246 \qquad && \text{posiciones de orden máximas por ruta} \\
     &(x_{cs},\ y_{cs}) = (-200,\ 2500) \qquad && \text{coordenadas de la estación de control}
 \end{alignat}
 
