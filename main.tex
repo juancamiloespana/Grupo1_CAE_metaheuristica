@@ -166,6 +166,37 @@ La instancia utilizada en este trabajo es \textbf{Valdebueyes3}, cuyos parámetr
 
 \section{Fase 1: Evaluación de la Convergencia Práctica}
 
+Antes de comparar configuraciones, es necesario comprobar que el algoritmo dispone de
+un presupuesto de ejecución suficiente para converger. Para ello se fijó
+$\alpha = \mu = \lambda$, es decir, el tamaño de la población, el número de hijos
+generados y el número de supervivientes son iguales en cada generación.
+La instancia Valdebueyes3 cuenta con 121 pasadas y un máximo de 10 drones, lo que
+produce un cromosoma de 130 genes (121 pasadas + 9 separadores de dron).
+Con este tamaño de problema, se eligió el siguiente punto de partida:
+
+\begin{itemize}
+  \item \textbf{Población ($\alpha = \mu = \lambda$) = 50:} suficiente diversidad sin
+        disparar el tiempo de ejecución.
+  \item \textbf{Generaciones iniciales = 200:} presupuesto modesto ($\approx$10\,000
+        evaluaciones) que permite ver si la curva evoluciona, y que se puede doblar
+        fácilmente en los pasos siguientes.
+  \item \textbf{Tasa de cruce = 0.95} (valor por defecto de Opt4J): tasa alta habitual
+        en GAs sobre permutaciones; se estudiará como factor en la Fase~2.
+  \item \textbf{Tasa de mutación = adaptativa} (por defecto $\approx 1/130$ por gen):
+        muta aproximadamente un gen por individuo, lo justo para explorar sin destruir
+        la estructura de las rutas.
+  \item \textbf{Operador de mutación = MIXED:} combina SWAP, INSERT y REVERT
+        aleatoriamente; es la referencia neutra para esta fase.
+\end{itemize}
+
+A partir de esta configuración base (C0), se observó visualmente en la GUI de Opt4J
+la curva de evolución de ambas funciones objetivo. Si alguna curva no se había
+estabilizado, se dobló el número de generaciones (C1, C2, \ldots) y se comprobó si
+la mejora obtenida superaba el 1\%. En caso contrario, se consideró alcanzada la
+convergencia práctica y esa configuración pasó a ser la base para la Fase~2.
+
+% TODO: insertar tabla C0/C1/C2 con resultados reales y capturas de curvas de convergencia
+
 \section{Fase 2: Análisis Paramétrico}
 
 \subsection{Factores Mínimos de Estudio}
