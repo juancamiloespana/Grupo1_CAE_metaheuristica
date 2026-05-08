@@ -13,6 +13,7 @@
 \usepackage{float}
 \usepackage{natbib}
 \usepackage{listings}
+\usepackage{xcolor}
 
 \titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
 \titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
@@ -43,6 +44,13 @@ Universidad de Oviedo\\
 
 \newpage
 \section{Introducción y Contexto del Problema}
+
+
+Durante la asignatura hemos visto distintos métodos de optimización para poder resolver problemas relacionados con la búsqueda de soluciones eficientes, algunos de los ejemplos trabajados durante el curso estaban los problemas de optimización multiobjetivo y variantes del problema de rutas de vehículos (VRP), los que nos van a servir como base para desarrollar esta práctica. Gracias a estos conocimientos adquiridos nos es posible comprender cómo representar soluciones, evaluar alternativas y utilizar algoritmos genéticos para aproximarnos a soluciones optimas y de alta calidad en problemas reales.
+Los drones se han convertido en una herramienta muy útil, el uso de estas herramientas nos ayuda a realizar recorridos de vigilancia de manera más rápida comparados con los métodos tradicionales, además de bajar costes operativos y facilitar el acceso a áreas difíciles de cubrir de forma terrestre. Para seguir reduciendo estos costes y además obtener el máximo beneficio y rendimiento de dichos drones, debemos organizar correctamente las rutas.
+Dicha organización de una flota de drones nos representa un problema complejo. Ya que cada dron debe cubrir determinados barridos de la zona de estudio y regresar posteriormente a una estación de control común. Existen muchas formas posibles de distribuir los barridos entre los drones y de definir el orden en que serán recorridos, por lo que encontrar soluciones eficientes no resulta una tarea trivial.
+En esta práctica, nuestro objetivo principal será minimizar la distancia máxima recorrida por un dron y así mismo minimizar la cantidad de drones utilizados. Y para cumplir con este objetivo utilizaremos la herramienta de framework Opt4J, el cual nos va a permitir implementar algoritmos evolutivos multiobjetivo. vamos a desarrollar un modelo formal del problema, definiendo matemáticamente los drones, los puntos de barrido, las rutas y las restricciones necesarias para representar correctamente las soluciones válidas.
+
 \section{Modelamiento Formal del Problema de Drones}
 
 A continuación se presenta la formulación matemática del problema de asignación y ruteo de drones. El modelo describe los conjuntos que intervienen mediante índices, los datos fijos mediante parámetros, y las decisiones con la variable de decisión \(X_{ijk}\), de la que se derivan varias variables auxiliares. Las funciones objetivo representan los dos criterios que se buscan minimizar al mismo tiempo, y las restricciones definen las soluciones permitidas y las reglas de operación. La sección termina con los valores concretos de la instancia de estudio usada en los experimentos.
@@ -177,16 +185,12 @@ Con este tamaño de problema, se eligió el siguiente punto de partida:
 \begin{itemize}
   \item \textbf{Población ($\alpha = \mu = \lambda$) = 50:} suficiente diversidad sin
         disparar el tiempo de ejecución.
-  \item \textbf{Generaciones iniciales = 200:} presupuesto modesto ($\approx$10\,000
-        evaluaciones) que permite ver si la curva evoluciona, y que se puede doblar
-        fácilmente en los pasos siguientes.
+  \item \textbf{Generaciones iniciales = 200:} presupuesto inicial de $\approx$10\,000
+        evaluaciones, suficiente para observar si la curva evoluciona antes de doblar.
   \item \textbf{Tasa de cruce = 0.95} (valor por defecto de Opt4J): tasa alta habitual
         en GAs sobre permutaciones; se estudiará como factor en la Fase~2.
-  \item \textbf{Tasa de mutación = adaptativa} (por defecto $\approx 1/130$ por gen):
-        muta aproximadamente un gen por individuo, lo justo para explorar sin destruir
-        la estructura de las rutas.
-  \item \textbf{Operador de mutación = MIXED:} combina SWAP, INSERT y REVERT
-        aleatoriamente; es la referencia neutra para esta fase.
+  \item \textbf{Torneo NSGA-II = 2:} selección por torneo binario estándar, equilibra
+        presión selectiva sin eliminar diversidad prematuramente.
 \end{itemize}
 
 A partir de esta configuración base (C0), se observó visualmente en la GUI de Opt4J
@@ -196,6 +200,16 @@ la mejora obtenida superaba el 1\%. En caso contrario, se consideró alcanzada l
 convergencia práctica y esa configuración pasó a ser la base para la Fase~2.
 
 % TODO: insertar tabla C0/C1/C2 con resultados reales y capturas de curvas de convergencia
+
+\vspace{0.5em}
+\noindent\colorbox{yellow}{%
+  \parbox{\dimexpr\linewidth-2\fboxsep}{%
+    \textbf{NOTA PARA SIGUIENTE FASE} Tras la experimentación de convergencia, la configuración
+    recomendada para la Fase~2 es \textbf{40.000 generaciones} y \textbf{población = 100}
+    ($\alpha = \mu = \lambda = 100$).    Usar esta configuración como punto de partida para el análisis paramétrico.
+  }%
+}
+\vspace{0.5em}
 
 \section{Fase 2: Análisis Paramétrico}
 
